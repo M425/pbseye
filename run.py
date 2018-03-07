@@ -197,7 +197,6 @@ def get_jobstream(stdtype, job_id):
     jobstdstream = xmljob.find(target_path).text.split(':')[1]
     owner = xmljob.find('Job_Owner').text.split('@')[0]
     # submit_host = xmljob.find('submit_host').text
-    print owner
 
     proc_exit, proc_out, proc_err = run_cmd('runuser -l {} -c "cat {}"'.format(owner, jobstdstream))
     if len(proc_out) < 1:
