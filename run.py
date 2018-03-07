@@ -51,7 +51,6 @@ def get_jobs():
     jobs = []
     for line in proc_out:
         linarr = line.split()
-        print linarr
         jobs.append({
             'job_id': linarr[0],
             'user': linarr[1],
@@ -129,7 +128,6 @@ def get_jobdetailx(job_id):
     proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -x'.format(job_id))
     if len(proc_out) < 1:
         return build_resp([])
-    print proc_out
 
     root = ET.fromstring(' '.join(proc_out))
     xmljob = root.find('Job')
@@ -174,7 +172,6 @@ def get_jobdetail(job_id):
     proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(job_id))
     if len(proc_out) < 1:
         return build_resp([])
-    print proc_out
 
     ret = {}
     for line in proc_out:
@@ -195,7 +192,6 @@ def get_jobstream(stdtype, job_id):
     proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -x'.format(job_id))
     if len(proc_out) < 1:
         return build_resp([])
-    print proc_out
 
     root = ET.fromstring(' '.join(proc_out))
     xmljob = root.find('Job')
@@ -206,6 +202,5 @@ def get_jobstream(stdtype, job_id):
     proc_exit, proc_out, proc_err = run_cmd('cat {}'.format(jobstdstream))
     if len(proc_out) < 1:
         return build_resp([])
-    print proc_out
 
     return build_resp(proc_out)
