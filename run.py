@@ -65,14 +65,14 @@ def get_jobs():
             'eleTime': linarr[10],
             'wn': linarr[11],
         })
-#        if linarr[9] == 'C':
-#            proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
-#            for line in proc_out:
-#                if line[:18] == '    exit_status = ':
-#                    exit_status = line[18:]
-#            jobs[-1]['exit_status'] = exit_status
-#        else:
-#            jobs[-1]['exit_status'] = '--'
+        # if linarr[9] == 'C':
+        #     proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
+        #     for line in proc_out:
+        #         if line[:18] == '    exit_status = ':
+        #             exit_status = line[18:]
+        #     jobs[-1]['exit_status'] = exit_status
+        # else:
+        #     jobs[-1]['exit_status'] = '--'
 
         proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
         for line in proc_out:
@@ -88,43 +88,41 @@ def get_jobs():
     return build_resp(jobs)
 
 
-'''
-<Data>
-  <Job>
-    <Job_Id>89890.gridvm03.roma2.infn.it</Job_Id>
-    <Job_Name>test-job.sh</Job_Name>
-    <Job_Owner>pinamonti@atlas-vm-pinamonti</Job_Owner>
-    <job_state>R</job_state>
-    <queue>localq</queue>
-    <server>gridvm03.roma2.infn.it</server>
-    <Checkpoint>u</Checkpoint>
-    <ctime>1518884705</ctime>
-    <Error_Path>localhost:/home/pinamonti/test-job.sh.e89890</Error_Path>
-    <exec_host>wn20.localdomain/1</exec_host>
-    <Hold_Types>n</Hold_Types>
-    <Join_Path>n</Join_Path>
-    <Keep_Files>n</Keep_Files>
-    <Mail_Points>a</Mail_Points>
-    <mtime>1518884706</mtime>
-    <Output_Path>localhost:/home/pinamonti/test-job.sh.o89890</Output_Path>
-    <Priority>0</Priority>
-    <qtime>1518884705</qtime>
-    <Rerunable>True</Rerunable>
-    <session_id>55232</session_id>
-    <etime>1518884705</etime>
-    <submit_args>test-job.sh -q localq -o localhost:/home/pinamonti/ -e localhost:/home/pinamonti/</submit_args>
-    <start_time>1518884706</start_time>
-    <start_count>1</start_count>
-    <fault_tolerant>False</fault_tolerant>
-    <submit_host>atlas-vm-pinamonti</submit_host>
-    <init_work_dir>/home/pinamonti</init_work_dir>
-  </Job>
-</Data>
-'''
-
-
 @app.route("/xjob/<int:job_id>")
 def get_jobdetailx(job_id):
+    '''
+    <Data>
+      <Job>
+        <Job_Id>89890.gridvm03.roma2.infn.it</Job_Id>
+        <Job_Name>test-job.sh</Job_Name>
+        <Job_Owner>pinamonti@atlas-vm-pinamonti</Job_Owner>
+        <job_state>R</job_state>
+        <queue>localq</queue>
+        <server>gridvm03.roma2.infn.it</server>
+        <Checkpoint>u</Checkpoint>
+        <ctime>1518884705</ctime>
+        <Error_Path>localhost:/home/pinamonti/test-job.sh.e89890</Error_Path>
+        <exec_host>wn20.localdomain/1</exec_host>
+        <Hold_Types>n</Hold_Types>
+        <Join_Path>n</Join_Path>
+        <Keep_Files>n</Keep_Files>
+        <Mail_Points>a</Mail_Points>
+        <mtime>1518884706</mtime>
+        <Output_Path>localhost:/home/pinamonti/test-job.sh.o89890</Output_Path>
+        <Priority>0</Priority>
+        <qtime>1518884705</qtime>
+        <Rerunable>True</Rerunable>
+        <session_id>55232</session_id>
+        <etime>1518884705</etime>
+        <submit_args>test-job.sh -q localq -o localhost:/home/pinamonti/ -e localhost:/home/pinamonti/</submit_args>
+        <start_time>1518884706</start_time>
+        <start_count>1</start_count>
+        <fault_tolerant>False</fault_tolerant>
+        <submit_host>atlas-vm-pinamonti</submit_host>
+        <init_work_dir>/home/pinamonti</init_work_dir>
+      </Job>
+    </Data>
+    '''
     proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -x'.format(job_id))
     if len(proc_out) < 1:
         return build_resp([])
@@ -204,3 +202,20 @@ def get_jobstream(stdtype, job_id):
         return build_resp([])
 
     return build_resp(proc_out)
+
+
+@app.route("/serverinfo")
+def get_serverinfo():
+    ret = {}
+    ret['localgroup'] = {'total': 0, 'used': 0, 'avail': 0}
+    proc_exit, proc_out, proc_err = run_cmd('df')
+    if len(proc_out) > 1:
+        for line in proc_out:
+            line = line.strip()
+            linearr = line.split(' ')
+            if linearr[-1].strip() == '/localgroup':
+                ret['localgroup']['total'] = linearr[0].strip()
+                ret['localgroup']['used'] = linearr[1].strip()
+                ret['localgroup']['avail'] = linearr[2].strip()
+
+    return build_resp(ret)
