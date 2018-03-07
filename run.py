@@ -195,7 +195,7 @@ def get_jobstream(stdtype, job_id):
     xmljob = root.find('Job')
     target_path = 'Output_Path' if stdtype == 'output' else 'Error_Path'
     jobstdstream = xmljob.find(target_path).text.split(':')[1]
-    owner = xmljob.find('Job_owner').text.split('@')[0]
+    owner = xmljob.find('Job_Owner').text.split('@')[0]
     # submit_host = xmljob.find('submit_host').text
     print owner
 
