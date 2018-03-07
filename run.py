@@ -195,7 +195,7 @@ def get_jobstream(stdtype, job_id):
     xmljob = root.find('Job')
     target_path = 'Output_Path' if stdtype == 'output' else 'Error_Path'
     jobstdstream = xmljob.find(target_path).text.split(':')[1]
-    submit_host = xmljob.find('submit_host').text
+    # submit_host = xmljob.find('submit_host').text
 
     proc_exit, proc_out, proc_err = run_cmd('cat {}'.format(jobstdstream))
     if len(proc_out) < 1:
@@ -218,9 +218,9 @@ def get_serverinfo():
                 ret['localgroup']['used'] = linearr[1].strip()
                 ret['localgroup']['avail'] = linearr[2].strip()
 
-    ret['workers'] = {'total': 0, 'totaljobs': 0}
+    ret['workers'] = {'total': 20, 'free': 0, 'totaljobs': 0}
     proc_exit, proc_out, proc_err = run_cmd('pbsnodes -l free')
-    print proc_out
-    print len(proc_out)
+    ret['workers']['free'] = len(proc_out)
+    ret['workers']['totaljobs'] = len(proc_out) * 4
 
     return build_resp(ret)
