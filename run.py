@@ -66,14 +66,26 @@ def get_jobs():
             'eleTime': linarr[10],
             'wn': linarr[11],
         })
-        if linarr[9] == 'C':
-            proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
-            for line in proc_out:
-                if line[:18] == '    exit_status = ':
-                    exit_status = line[18:]
-            jobs[-1]['exit_status'] = exit_status
-        else:
-            jobs[-1]['exit_status'] = '--'
+#        if linarr[9] == 'C':
+#            proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
+#            for line in proc_out:
+#                if line[:18] == '    exit_status = ':
+#                    exit_status = line[18:]
+#            jobs[-1]['exit_status'] = exit_status
+#        else:
+#            jobs[-1]['exit_status'] = '--'
+
+        proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
+        for line in proc_out:
+            line = line.strip()
+            j_kvarr = line.split('=', 1)
+            if len(j_kvarr) != 2:
+                continue
+            [j_key, j_val] = j_kvarr
+            j_key = j_key.strip()
+            j_val = j_val.strip()
+            jobs[-1][j_key] = j_val
+
     return build_resp(jobs)
 
 
