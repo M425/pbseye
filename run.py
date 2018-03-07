@@ -195,9 +195,11 @@ def get_jobstream(stdtype, job_id):
     xmljob = root.find('Job')
     target_path = 'Output_Path' if stdtype == 'output' else 'Error_Path'
     jobstdstream = xmljob.find(target_path).text.split(':')[1]
+    owner = xmljob.find('Job_owner').text.split('@')[0]
     # submit_host = xmljob.find('submit_host').text
+    print owner
 
-    proc_exit, proc_out, proc_err = run_cmd('cat {}'.format(jobstdstream))
+    proc_exit, proc_out, proc_err = run_cmd('runuser -l {} -c "cat {}"'.format(owner, jobstdstream))
     if len(proc_out) < 1:
         return build_resp([])
 
