@@ -207,6 +207,8 @@ def get_jobstream(stdtype, job_id):
 @app.route("/serverinfo")
 def get_serverinfo():
     ret = {}
+
+    # localgroup
     ret['localgroup'] = {'total': 0, 'used': 0, 'avail': 0}
     proc_exit, proc_out, proc_err = run_cmd('df')
     if len(proc_out) > 1:
@@ -218,9 +220,27 @@ def get_serverinfo():
                 ret['localgroup']['used'] = linearr[1].strip()
                 ret['localgroup']['avail'] = linearr[2].strip()
 
+    # workers
     ret['workers'] = {'total': 20, 'free': 0, 'totaljobs': 20 * 4, 'freejobs': 0}
     proc_exit, proc_out, proc_err = run_cmd('pbsnodes -l free')
     ret['workers']['free'] = len(proc_out)
     ret['workers']['freejobs'] = len(proc_out) * 4
+
+    # jobs
+    proc_exit, proc_out, proc_err = run_cmd('qstat -an1')
+    if len(proc_out) < 1:
+        return build_resp([])
+    # Job ID  Username    Queue    Jobname          SessID  NDS   TSK   Memory   Time    S   Time
+
+    proc_out = proc_out[4:]
+    jobs_running = 0
+    jobs_queued = 0
+    for line in proc_out:
+        linarr = line.split()
+        if linarr[9] == 'R':
+            jobs_running += 1
+        if linarr[9] == 'Q':
+            jobs_queued += 1
+    ret['jobs'] = {'running': jobs_running, 'queued': jobs_queued}
 
     return build_resp(ret)
