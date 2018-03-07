@@ -218,9 +218,9 @@ def get_serverinfo():
                 ret['localgroup']['used'] = linearr[1].strip()
                 ret['localgroup']['avail'] = linearr[2].strip()
 
-    ret['workers'] = {'total': 20, 'free': 0, 'totaljobs': 0}
+    ret['workers'] = {'total': 20, 'free': 0, 'totaljobs': 20 * 4, 'freejobs': 0}
     proc_exit, proc_out, proc_err = run_cmd('pbsnodes -l free')
     ret['workers']['free'] = len(proc_out)
-    ret['workers']['totaljobs'] = len(proc_out) * 4
+    ret['workers']['freejobs'] = len(proc_out) * 4
 
     return build_resp(ret)
