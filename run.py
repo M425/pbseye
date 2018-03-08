@@ -65,6 +65,35 @@ def get_jobs():
             'eleTime': linarr[10],
             'wn': linarr[11],
         })
+
+    return build_resp(jobs)
+
+
+@app.route("/jobsdetailed")
+def get_jobsdetailed():
+    proc_exit, proc_out, proc_err = run_cmd('qstat -an1')
+    if len(proc_out) < 1:
+        return build_resp([])
+    # Job ID  Username    Queue    Jobname          SessID  NDS   TSK   Memory   Time    S   Time
+
+    proc_out = proc_out[4:]
+    jobs = []
+    for line in proc_out:
+        linarr = line.split()
+        jobs.append({
+            'job_id': linarr[0],
+            'user': linarr[1],
+            'queue': linarr[2],
+            'job': linarr[3],
+            'session': linarr[4],
+            'NDS': linarr[5],
+            'TSK': linarr[6],
+            'memory': linarr[7],
+            'reqTime': linarr[8],
+            'status': linarr[9],
+            'eleTime': linarr[10],
+            'wn': linarr[11],
+        })
         # if linarr[9] == 'C':
         #     proc_exit, proc_out, proc_err = run_cmd('qstat -f {} -1'.format(linarr[0].split('.')[0]))
         #     for line in proc_out:
